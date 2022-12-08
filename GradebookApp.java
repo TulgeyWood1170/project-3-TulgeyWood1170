@@ -37,23 +37,12 @@ public class GradebookApp {
     public static String[][] sort(String[][] myArray) {
         String[][] swapArray = new String[students.length][NUM_COLUMNS];
         double avgGrade[] = new double[students.length];
+        String tempRecord[] = new String[NUM_COLUMNS];
         Student tempStudent = new Student();
-        /*
-         *  for (int i = 0; i < numberOfStudents; i++) {
-                students[i] = new Student();
-            }
-            //fill students data
-            for (int i = 0; i < numberOfStudents; i++) {
-                record = inf.nextLine();
-                students[i].importStudentData(record);
-            }
-                        
-         */
-        
+        //students[i] = new Student();
         for (int i = 0; i < students.length; i++) {
             avgGrade[i] = students[i].getGradeAverage();
         }
-        //System.out.println("avgGrade.length = " + avgGrade.length);
 
         //find max student avgGrade and row j, row i indexes to swap
         for (int i = 0; i < students.length; i++) {
@@ -69,24 +58,23 @@ public class GradebookApp {
                 }
             }
 
-            //swap i and j rows in avgGrade and in myArray
-            if (currentMaxIndex != i) {
-                avgGrade[currentMaxIndex] = avgGrade[i];
-                avgGrade[i] = currentMax;
-              
-                Student tempStudents = students[i];
-                students[i] = students[currentMaxIndex];
-                students[currentMaxIndex] = tempStudents;
-                
-                for (int k = 0; k < NUM_COLUMNS; k++) {
-                    swapArray[i][k] = myArray[currentMaxIndex][k];
-                    //System.out.println(i + ", " + k);
-                }
-                for (int k = 0; k < NUM_COLUMNS; k++) {
-                    swapArray[students.length-1][k] = myArray[students.length-1][k];    
-                }
-                
+            //swap i and j rows in avgGrade and myArray
+            //if (currentMaxIndex != i) {
+            avgGrade[currentMaxIndex] = avgGrade[i];
+            avgGrade[i] = currentMax;
+
+            for (int k = 0; k < NUM_COLUMNS; k++) {
+                tempRecord[k] = myArray[i][k];
             }
+            for (int k = 0; k < NUM_COLUMNS; k++) {
+                swapArray[i][k] = myArray[currentMaxIndex][k];
+            }
+            for (int k = 0; k < NUM_COLUMNS; k++) {
+                swapArray[currentMaxIndex][k] = tempRecord[k];
+            }
+            //for (int k = 0; k < NUM_COLUMNS; k++) {
+            //    tempStudent = student[
+            //}
         }
         return swapArray;
     }        
@@ -139,7 +127,6 @@ public class GradebookApp {
             }
             //print average grade for student row
             System.out.printf("  %5.1f%n", students[row].getGradeAverage());
-
         }
     }
 
@@ -431,19 +418,23 @@ public class GradebookApp {
                     break;
 
                 case "8":
-                    //double gradeAverage[] = new double[students.length];
-                    // get gradeAverage Array
-                    //for (int m = 0; m < students.length; m++) {
-                    //    gradeAverage[m] = students[m].getGradeAverage();
-                    //}
-                    String studentArray[][] = getStudentData();
-                    printArray(studentArray);
+                    try{
+                        String studentArray[][] = getStudentData();
+                        printArray(studentArray);
+                    } catch(NullPointerException e) {
+                        System.out.println("");
+                        System.out.println("Students array not initialized; load input file.");  
+                    }
                     break;
 
                 case "9":
-                    String[][] sortedArray = sort(getStudentData());
-                    //System.out.printf("%d%n", sortedArray.length);
-                    printArray(sortedArray);
+                    try{
+                        String[][] sortedArray = sort(getStudentData());
+                        printArray(sortedArray);
+                    } catch(NullPointerException e) {
+                        System.out.println("");
+                        System.out.println("Students array not initialized; load input file.");  
+                    }
                     break;
 
                 case "10":

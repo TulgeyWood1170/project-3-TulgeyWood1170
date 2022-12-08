@@ -1,8 +1,9 @@
 /**
- * Project 2
+ * Project 3
  * File i/o, parsing data, setting and getting student data
+ * Printing student Array and sorted student Array
  * Lisa Roland
- * 12.02.2022
+ * 12.07.2022
  */
 
 public class Student {
