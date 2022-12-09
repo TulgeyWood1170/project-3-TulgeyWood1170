@@ -20,26 +20,10 @@ public class GradebookApp {
         return grades;
     }
 
-    public static String[][] getStudentData() {
-        String[][] allData = new String[students.length][NUM_COLUMNS];
-        String record;
-        String studentRecord[];
-        for (int row = 0; row < students.length; row++) {
-            record = students[row].exportStudentData();
-            studentRecord = record.split(",");
-            for (int col = 0; col < NUM_COLUMNS; col++) {
-                allData[row][col] = studentRecord[col];
-            }
-        }
-        return allData;
-    }    
-
-    public static String[][] sort(String[][] myArray) {
-        String[][] swapArray = new String[students.length][NUM_COLUMNS];
+    public static double[] getcurrentSortedGradeAverages() {
+        
         double avgGrade[] = new double[students.length];
-        String tempRecord[] = new String[NUM_COLUMNS];
-        Student tempStudent = new Student();
-        //students[i] = new Student();
+        
         for (int i = 0; i < students.length; i++) {
             avgGrade[i] = students[i].getGradeAverage();
         }
@@ -54,32 +38,90 @@ public class GradebookApp {
                 if (currentMax < avgGrade[j]) {
                     currentMax = avgGrade[j];
                     currentMaxIndex = j;
-                    //System.out.println("current index = " + j + "current max row is " + currentMaxIndex);
                 }
             }
 
-            //swap i and j rows in avgGrade and myArray
-            //if (currentMaxIndex != i) {
-            avgGrade[currentMaxIndex] = avgGrade[i];
-            avgGrade[i] = currentMax;
+            if (currentMaxIndex != i) {
+                avgGrade[currentMaxIndex] = avgGrade[i];
+                avgGrade[i] = currentMax;
+            }
+        }
+        return avgGrade;
+    }
 
+    public static String[][] getStudentData() {
+        String[][] allData = new String[students.length][NUM_COLUMNS];
+        String record;
+        String studentRecord[];
+        
+        //get current student data row by row and and fill array
+        for (int row = 0; row < students.length; row++) {
+            record = students[row].exportStudentData();
+            studentRecord = record.split(",");
+            for (int col = 0; col < NUM_COLUMNS; col++) {
+                allData[row][col] = studentRecord[col];
+            }
+        }
+        return allData;
+    }    
+
+    public static String[][] sort(String[][] myArray) { 
+        
+        // sorting total grades is also done in method getcurrentSortedGradeAverages()
+        // but is needed here for the i, j indexes to swap array rows
+        double avgGrade[] = new double[students.length];
+        String tempRecord[] = new String[NUM_COLUMNS];
+        Student tempStudent = new Student();
+        
+        // fill avgGrade one-dimentional array with unsorted grade averarages
+        for (int i = 0; i < students.length; i++) {
+            avgGrade[i] = students[i].getGradeAverage();
+        }
+
+        // sort avgGrade so I can use i, j indexes
+        // to sort myArray 
+        
+        for (int i = 0; i < students.length; i++) {
+            double currentMax = avgGrade[i];
+            int currentMaxIndex = i;
+
+            //get j index for max value after i
+            for (int j = i + 1; j < avgGrade.length; j++) {
+                if (currentMax < avgGrade[j]) {
+                    currentMax = avgGrade[j];
+                    currentMaxIndex = j;
+                }
+            }
+
+            //swap i and j rows in avgGrade
+            if (currentMaxIndex != i) {
+                avgGrade[currentMaxIndex] = avgGrade[i];
+                avgGrade[i] = currentMax;
+            }
+
+            //swap rows i and j in myArray
+            //need a temp record to swap properly
             for (int k = 0; k < NUM_COLUMNS; k++) {
                 tempRecord[k] = myArray[i][k];
             }
             for (int k = 0; k < NUM_COLUMNS; k++) {
-                swapArray[i][k] = myArray[currentMaxIndex][k];
+                myArray[i][k] = myArray[currentMaxIndex][k];
             }
             for (int k = 0; k < NUM_COLUMNS; k++) {
-                swapArray[currentMaxIndex][k] = tempRecord[k];
+                myArray[currentMaxIndex][k] = tempRecord[k];
             }
-            //for (int k = 0; k < NUM_COLUMNS; k++) {
-            //    tempStudent = student[
-            //}
-        }
-        return swapArray;
-    }        
-
-    public static void printArray(String[][] myArray) {
+        } 
+        return myArray;
+    }
+    
+    public static void printArray(String[][] myArray, int i) {
+        
+        // get sorted average total grades if need to print sorted grades 
+        // # 10 selection in main menu
+        double[] sortedGrades = getcurrentSortedGradeAverages();
+        
+        // there are 2 lines to the header
+        // printing headers is messy!
         // print first line of header
         System.out.printf("     ");
         for (int col = 0; col < 2; col++) {
@@ -126,7 +168,11 @@ public class GradebookApp {
                 System.out.printf("%3d   ", Integer.parseInt(myArray[row][col]));
             }
             //print average grade for student row
-            System.out.printf("  %5.1f%n", students[row].getGradeAverage());
+            if (i == 1) {                
+                System.out.printf("  %5.1f%n", sortedGrades[row]);
+            } else {
+                System.out.printf("  %5.1f%n", students[row].getGradeAverage());
+            }
         }
     }
 
@@ -318,11 +364,11 @@ public class GradebookApp {
                         score = Integer.parseInt(in.nextLine());
 
                         if (examNumber.equals("1") || examNumber.equals("2") || examNumber.equals("3") ||
-                        examNumber.equals("WrittenFinal") || examNumber.equals("PracticalFinal")) {
+                          examNumber.equals("WrittenFinal") || examNumber.equals("PracticalFinal")) {
                             examValid = true;
                         }
                         if (studentID >= 1 && studentID <= numberOfStudents && examValid &&
-                        score >= 0 && score <= 100) {
+                          score >= 0 && score <= 100) {
                             System.out.println("");
                             System.out.print(studentID + ". ");
                         }        
@@ -420,7 +466,7 @@ public class GradebookApp {
                 case "8":
                     try{
                         String studentArray[][] = getStudentData();
-                        printArray(studentArray);
+                        printArray(studentArray,0);
                     } catch(NullPointerException e) {
                         System.out.println("");
                         System.out.println("Students array not initialized; load input file.");  
@@ -430,7 +476,7 @@ public class GradebookApp {
                 case "9":
                     try{
                         String[][] sortedArray = sort(getStudentData());
-                        printArray(sortedArray);
+                        printArray(sortedArray, 1);
                     } catch(NullPointerException e) {
                         System.out.println("");
                         System.out.println("Students array not initialized; load input file.");  
@@ -438,7 +484,7 @@ public class GradebookApp {
                     break;
 
                 case "10":
-                    // write the current student data to file
+                    // write the current student data to file (unsorted)
                     System.out.print("Enter the name of the output file ");
                     fileName= in.nextLine();
                     try {
